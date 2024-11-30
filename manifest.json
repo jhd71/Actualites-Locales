@@ -2,7 +2,7 @@
     "name": "Actualités locales",
     "short_name": "Actualités",
     "description": "Accès rapide aux actualités locales et personnalisées",
-    "start_url": "/actualites-locales/index.html",
+    "start_url": "https://jhd71.github.io/Actualites-Locales/",
     "display": "standalone",
     "background_color": "#1a1a1a",
     "theme_color": "#1a1a1a",

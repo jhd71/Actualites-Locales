@@ -1,10 +1,10 @@
 const CACHE_NAME = 'actualites-locales-v1';
 const assets = [
-    '/actualites-locales/',
-    '/actualites-locales/index.html',
-    '/actualites-locales/manifest.json',
-    '/actualites-locales/icon-192x192.png',
-    '/actualites-locales/icon-512x512.png'
+    'https://jhd71.github.io/Actualites-Locales/',
+    'https://jhd71.github.io/Actualites-Locales/index.html',
+    'https://jhd71.github.io/Actualites-Locales/manifest.json',
+    'https://jhd71.github.io/Actualites-Locales/icon-192x192.png',
+    'https://jhd71.github.io/Actualites-Locales/icon-512x512.png'
 ];
 
 // Installation du Service Worker
@@ -43,12 +43,9 @@ self.addEventListener('fetch', (event) => {
                 }
 
                 // Clone la requête
-                const fetchRequest = event.request.clone();
-
-                // Fait la requête au réseau
-                return fetch(fetchRequest).then(
+                return fetch(event.request).then(
                     (response) => {
-                        if(!response || response.status !== 200 || response.type !== 'basic') {
+                        if(!response || response.status !== 200) {
                             return response;
                         }
 
