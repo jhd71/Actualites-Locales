@@ -1,10 +1,10 @@
 const CACHE_NAME = 'actualites-locales-v1';
 const assets = [
-    '.',
-    'index.html',
-    'manifest.json',
-    'icon-192x192.png',
-    'icon-512x512.png'
+    'https://jhd71.github.io/Actualites-Locales/',
+    'https://jhd71.github.io/Actualites-Locales/index.html',
+    'https://jhd71.github.io/Actualites-Locales/manifest.json',
+    'https://jhd71.github.io/Actualites-Locales/icon-192x192.png',
+    'https://jhd71.github.io/Actualites-Locales/icon-512x512.png'
 ];
 
 // Installation du Service Worker
