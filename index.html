@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Actualités locales</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Actualités locales">
     <style>
         :root {
             --bg-dark: #1a1a1a;
@@ -46,9 +52,7 @@
             justify-content: center;
             padding: 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .theme-toggle svg {
+        }.theme-toggle svg {
             width: 24px;
             height: 24px;
             fill: currentColor;
@@ -183,8 +187,7 @@
             right: 0;
         }
     </style>
-</head>
-<body data-theme="dark">
+</head><body data-theme="dark">
     <button class="theme-toggle" onclick="changeTheme()">
         <svg class="sun-icon" viewBox="0 0 24 24">
             <path d="M12 3a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1zm9-9h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zM4 9H3a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zm15.7 7.7a1 1 0 0 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 1.4l-.7.7zM4.3 4.3a1 1 0 0 1 1.4 0l.7.7a1 1 0 0 1-1.4 1.4l-.7-.7a1 1 0 0 1 0-1.4zm15.4 0a1 1 0 0 1 0 1.4l-.7.7a1 1 0 1 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0zM4.3 19.7a1 1 0 0 1 0-1.4l.7-.7a1 1 0 0 1 1.4 1.4l-.7.7a1 1 0 0 1-1.4 0zM12 5a7 7 0 1 1 0 14 7 7 0 0 1 0-14z"/>
@@ -240,9 +243,7 @@
 
     <a href="mailto:infos71@free.fr" class="contact-button">Contactez-nous</a>
 
-    <footer>© 2024 JHD</footer>
-
-    <script>
+    <footer>© 2024 JHD</footer><script>
         function changeTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
@@ -345,6 +346,17 @@
         }
 
         renderUserSites();
+
+        // Service Worker pour PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then((registration) => {
+                    console.log('Service Worker enregistré');
+                })
+                .catch((error) => {
+                    console.log('Erreur d\'enregistrement du Service Worker:', error);
+                });
+        }
     </script>
 </body>
 </html>
