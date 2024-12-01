@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Actualités locales">
-    <style>
+	<style>
         :root {
             --bg-dark: #1a1a1a;
             --bg-light: #f5f5f5;
@@ -77,7 +77,7 @@
         [data-theme="light"] .moon-icon {
             display: block;
         }
-.card {
+		.card {
             background: var(--card-gradient-dark);
             padding: 15px;
             margin: 10px auto;
@@ -150,14 +150,18 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #00aaff;
+            background: var(--card-gradient-dark);
             color: white;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 15px;
             text-decoration: none;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            font-size: 0.9em;
+            font-size: 0.85em;
             z-index: 1000;
+        }
+
+        body[data-theme="light"] .contact-button {
+            background: var(--card-gradient-light);
         }
 
         footer {
@@ -189,7 +193,7 @@
         .card.sliding .delete-indicator {
             right: 0;
         }
-/* Styles pour le chat */
+		/* Styles pour le chat et les notifications */
         .chat-button {
             position: fixed;
             bottom: 20px;
@@ -202,6 +206,28 @@
             z-index: 1000;
             border: none;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .notification-badge.show {
+            display: flex;
         }
 
         .chat-container {
@@ -263,6 +289,13 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .chat-send:hover {
+            background: #3498db;
         }
 
         .message {
@@ -315,9 +348,6 @@
 
     <h2>Actualités générales</h2>
     <div class="card">
-        <a href="https://m.20minutes.fr/" target="_blank">20 Minutes</a>
-    </div>
-    <div class="card">
         <a href="https://www.jeanmarcmorandini.com/" target="_blank">Jean-Marc Morandini</a>
     </div>
     <div class="card">
@@ -343,8 +373,11 @@
         <button onclick="addNewSite()">Ajouter</button>
     </div>
 
-    <!-- Chat -->
-    <button class="chat-button" onclick="toggleChat()">💬 Chat</button>
+    <!-- Chat avec badge de notification -->
+    <button class="chat-button" onclick="toggleChat()">
+        <span class="notification-badge" id="notificationBadge">0</span>
+        💬 Chat
+    </button>
     <div class="chat-container" id="chatContainer">
         <div class="chat-header">
             <span>Chat Local</span>
@@ -360,10 +393,13 @@
         </div>
     </div>
 
-    <a href="mailto:infos71@free.fr" class="contact-button">Contactez-nous</a>
+    <a href="mailto:infos71@free.fr" class="contact-button">Contactez moi</a>
 
     <footer>© 2024 JHD</footer>
-<script>
+	<script>
+        // Audio pour les notifications
+        const notificationSound = new Audio('data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVuiM+xAAAAAAD/+9DEAAAJdAF89AAAI0/ILn81wABEQhC6hCFVAgCAIA6D4Pg+D4IAgCAIf/xAEAQBAEP/8QBAEAQDgEHQfB8H3+D4Pg+CAIAgB/4gcAgc4Pg+D4Pg+DIIAAQQhDEIYxjGMY5jGMhDEIQjmMYxjGQhCEIAAD/w+D6wfZNGOiL3df//9vd13Re5COf//yEvf//5CGf///5jn////ao5/////9ZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/w+D4Pg+D4P/////////////+YPg+D4Pg+D/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+MYxjGMYxj/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////');
+
         function changeTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
@@ -376,6 +412,36 @@
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             document.body.setAttribute('data-theme', savedTheme);
+        }
+
+        // Demander la permission pour les notifications
+        let notificationsEnabled = false;
+        if ('Notification' in window) {
+            Notification.requestPermission().then(function(permission) {
+                notificationsEnabled = permission === 'granted';
+            });
+        }
+
+        let unreadMessages = 0;
+        const badge = document.getElementById('notificationBadge');
+
+        function updateBadge() {
+            badge.textContent = unreadMessages;
+            badge.classList.toggle('show', unreadMessages > 0);
+        }
+
+        function showNotification(message) {
+            if (!document.hasFocus() && notificationsEnabled) {
+                new Notification('Nouveau message', {
+                    body: message,
+                    icon: 'icon-192x192.png'
+                });
+                notificationSound.play().catch(e => console.log('Erreur audio:', e));
+            }
+            if (!isChatOpen) {
+                unreadMessages++;
+                updateBadge();
+            }
         }
 
         let userSites = JSON.parse(localStorage.getItem('userSites')) || [];
@@ -476,6 +542,8 @@
             isChatOpen = !isChatOpen;
             chatContainer.classList.toggle('open', isChatOpen);
             if (isChatOpen) {
+                unreadMessages = 0;
+                updateBadge();
                 document.getElementById('chatInput')?.focus();
                 scrollToBottom();
             }
@@ -495,6 +563,7 @@
                 chatMessages.push(newMessage);
                 localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
                 renderMessages();
+                showNotification(message);
                 input.value = '';
                 scrollToBottom();
             }
@@ -524,7 +593,7 @@
         // Charger les messages au démarrage
         renderMessages();
 
-        // Optionnel : Nettoyer les vieux messages (garder seulement les 50 derniers)
+        // Nettoyer les vieux messages (garder seulement les 50 derniers)
         if (chatMessages.length > 50) {
             chatMessages = chatMessages.slice(-50);
             localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
