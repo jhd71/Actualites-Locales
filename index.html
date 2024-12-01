@@ -467,5 +467,18 @@
                 });
         }
     </script>
+	// Sélectionner les éléments du chat
+const chatButton = document.querySelector('.chat-button');
+const chatContainer = document.querySelector('.chat-container');
+const chatCloseBtn = document.querySelector('.chat-close-btn');
+
+// Ouvrir et fermer la fenêtre de chat
+chatButton.addEventListener('click', () => {
+  chatContainer.classList.toggle('open');
+});
+
+chatCloseBtn.addEventListener('click', () => {
+  chatContainer.classList.remove('open');
+});
 </body>
 </html>
