@@ -52,7 +52,9 @@
             justify-content: center;
             padding: 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }.theme-toggle svg {
+        }
+
+        .theme-toggle svg {
             width: 24px;
             height: 24px;
             fill: currentColor;
@@ -186,8 +188,105 @@
         .card.sliding .delete-indicator {
             right: 0;
         }
+
+        /* Styles pour le chat */
+        .chat-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card-gradient-dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: -400px;
+            left: 20px;
+            width: 300px;
+            height: 400px;
+            background: var(--bg-dark);
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+            transition: bottom 0.3s ease;
+            z-index: 999;
+        }
+
+        .chat-container.open {
+            bottom: 0;
+        }
+
+        .chat-header {
+            background: var(--card-gradient-dark);
+            color: white;
+            padding: 10px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .chat-input-area {
+            padding: 10px;
+            display: flex;
+            gap: 5px;
+            background: var(--bg-dark);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .chat-send {
+            padding: 8px 15px;
+            background: var(--contact-bg);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-break: break-word;
+        }
+
+        .message.sent {
+            background: var(--card-gradient-dark);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.received {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            margin-right: auto;
+        }
     </style>
-</head><body data-theme="dark">
+</head>
+<body data-theme="dark">
     <button class="theme-toggle" onclick="changeTheme()">
         <svg class="sun-icon" viewBox="0 0 24 24">
             <path d="M12 3a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1zm9-9h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zM4 9H3a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zm15.7 7.7a1 1 0 0 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 1.4l-.7.7zM4.3 4.3a1 1 0 0 1 1.4 0l.7.7a1 1 0 0 1-1.4 1.4l-.7-.7a1 1 0 0 1 0-1.4zm15.4 0a1 1 0 0 1 0 1.4l-.7.7a1 1 0 1 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0zM4.3 19.7a1 1 0 0 1 0-1.4l.7-.7a1 1 0 0 1 1.4 1.4l-.7.7a1 1 0 0 1-1.4 0zM12 5a7 7 0 1 1 0 14 7 7 0 0 1 0-14z"/>
@@ -211,6 +310,7 @@
     <div class="card">
         <a href="https://www.creusot-infos.com/" target="_blank">Creusot-infos</a>
     </div>
+
     <div class="separator"></div>
 
     <h2>Actualités générales</h2>
@@ -243,9 +343,27 @@
         <button onclick="addNewSite()">Ajouter</button>
     </div>
 
+    <!-- Chat -->
+    <button class="chat-button" onclick="toggleChat()">💬 Chat</button>
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <span>Chat Local</span>
+            <button onclick="toggleChat()" style="background: none; border: none; color: white; cursor: pointer;">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Les messages s'afficheront ici -->
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Votre message..." 
+                onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button class="chat-send" onclick="sendMessage()">Envoi</button>
+        </div>
+    </div>
+
     <a href="mailto:infos71@free.fr" class="contact-button">Contactez-nous</a>
 
-    <footer>© 2024 JHD</footer><script>
+    <footer>© 2024 JHD</footer>
+    <script>
         function changeTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
@@ -348,6 +466,69 @@
         }
 
         renderUserSites();
+
+        // Gestion du chat
+        let isChatOpen = false;
+        let chatMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+        const chatContainer = document.querySelector('.chat-container');
+
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            chatContainer.classList.toggle('open', isChatOpen);
+            if (isChatOpen) {
+                document.getElementById('chatInput')?.focus();
+                scrollToBottom();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                const newMessage = {
+                    text: message,
+                    timestamp: new Date().toISOString(),
+                    sender: 'user'
+                };
+                
+                chatMessages.push(newMessage);
+                localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+                renderMessages();
+                input.value = '';
+                scrollToBottom();
+            }
+        }
+
+        function renderMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            chatMessages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.sender === 'user' ? 'sent' : 'received'}`;
+                
+                // Vérifier si le message contient un lien
+                const messageText = msg.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #00aaff;">$1</a>');
+                
+                messageDiv.innerHTML = messageText;
+                messagesContainer.appendChild(messageDiv);
+            });
+        }
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Charger les messages au démarrage
+        renderMessages();
+
+        // Optionnel : Nettoyer les vieux messages (garder seulement les 50 derniers)
+        if (chatMessages.length > 50) {
+            chatMessages = chatMessages.slice(-50);
+            localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+        }
 
         // Service Worker pour PWA
         if ('serviceWorker' in navigator) {
