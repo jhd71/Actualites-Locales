@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Actualités locales</title>
-    <link rel="manifest" href="https://jhd71.github.io/Actualites-Locales/manifest.json">
-    <meta name="theme-color" content="#1a1a1a">
-    <link rel="apple-touch-icon" href="https://jhd71.github.io/Actualites-Locales/icon-192x192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Actualités locales">
     <style>
         :root {
             --bg-dark: #1a1a1a;
@@ -26,8 +20,8 @@
             font-family: Arial, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-dark);
-            transition: background-color 0.3s, color 0.3s;
             min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         body[data-theme="light"] {
@@ -39,55 +33,37 @@
             position: fixed;
             top: 15px;
             right: 15px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: none;
             border: none;
             cursor: pointer;
+            color: var(--text-dark);
+            font-size: 1.5em;
+        }
+
+        body[data-theme="light"] .theme-toggle {
+            color: var(--text-light);
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .tile {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .theme-toggle svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .sun-icon {
-            color: #ffd700;
-            display: none;
-        }
-
-        .moon-icon {
-            color: #87ceeb;
-            display: none;
-        }
-
-        [data-theme="dark"] .sun-icon {
-            display: block;
-        }
-
-        [data-theme="light"] .moon-icon {
-            display: block;
-        }
-
-        .card {
             background: var(--card-gradient-dark);
             padding: 15px;
-            margin: 10px auto;
+            margin: 10px;
             border-radius: 10px;
-            max-width: 280px;
-            text-align: center;
-            color: white;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            color: white;
+            font-size: 1.2em;
             transition: background 0.3s;
         }
 
-        body[data-theme="light"] .card {
+        body[data-theme="light"] .tile {
             background: var(--card-gradient-light);
         }
 
@@ -98,164 +74,139 @@
             width: 80%;
         }
 
-        h1, h2 {
-            text-align: center;
-        }
-
-        .add-site-form {
-            max-width: 280px;
-            margin: 20px auto;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-
-        .add-site-form input, .add-site-form button {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        .add-site-form button {
-            background: #00aaff;
-            color: white;
-            cursor: pointer;
-        }
-
-        .contact-button, .chat-button {
-            position: fixed;
-            bottom: 20px;
-            background: var(--card-gradient-dark);
-            color: white;
-            border-radius: 20px;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .contact-button {
-            right: 20px;
-        }
-
-        .chat-button {
-            left: 20px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 10px 0;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 20px;
-        }
-
-        body[data-theme="light"] footer {
-            color: rgba(0, 0, 0, 0.6);
-        }
-
         .chat-container {
             position: fixed;
             bottom: -450px;
-            left: 20px;
+            right: 20px;
             width: 300px;
             height: 450px;
-            background: #2c3e50;
+            background: #333;
             border-radius: 15px 15px 0 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
             transition: bottom 0.3s ease;
             z-index: 999;
         }
 
         .chat-container.open {
-            bottom: 80px;
+            bottom: 20px;
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #2980b9, #3498db);
+            background: #3949ab;
             color: white;
             padding: 10px;
             border-radius: 15px 15px 0 0;
             text-align: center;
             font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .chat-messages {
             height: 350px;
-            overflow-y: auto;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            overflow-y: auto;
+            background: #444;
         }
 
         .chat-input-area {
-            padding: 10px;
             display: flex;
             gap: 5px;
+            padding: 10px;
         }
 
         .chat-input {
-            flex: 1;
+            flex-grow: 1;
             padding: 8px;
             border: none;
             border-radius: 5px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
         }
 
         .chat-send {
-            padding: 8px 15px;
-            background: #2980b9;
+            background: #3949ab;
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 8px 15px;
             cursor: pointer;
+            border-radius: 5px;
         }
 
-        .message {
-            margin: 5px 0;
-            padding: 8px;
-            border-radius: 10px;
-            max-width: 80%;
-            word-break: break-word;
-        }
-
-        .message.sent {
-            background: linear-gradient(135deg, #2980b9, #3498db);
+        .contact-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #3949ab;
             color: white;
-            margin-left: auto;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
-        .message.received {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-right: auto;
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        body[data-theme="light"] footer {
+            color: rgba(0, 0, 0, 0.6);
         }
     </style>
 </head>
 <body data-theme="dark">
-    <button class="theme-toggle" onclick="changeTheme()">
-        <svg class="sun-icon" viewBox="0 0 24 24"><path d="M12 3a1 ..."></path></svg>
-        <svg class="moon-icon" viewBox="0 0 24 24"><path d="M12 3c..."></path></svg>
-    </button>
+    <button class="theme-toggle" onclick="changeTheme()">🌙</button>
 
     <h1>Actualités locales</h1>
-    <div class="card"><a href="https://www.montceau-news.com/" target="_blank">Montceau News</a></div>
-    <div class="separator"></div>
-    <h2>Vos sites personnalisés</h2>
-    <div id="user-sites"></div>
 
-    <div class="add-site-form">
-        <input type="text" id="siteName" placeholder="Nom du site">
-        <input type="url" id="siteUrl" placeholder="https://...">
-        <button onclick="addNewSite()">Ajouter</button>
+    <!-- Tuiles -->
+    <div class="tile"><a href="https://www.montceau-news.com/" target="_blank">Montceau News</a></div>
+    <div class="tile"><a href="https://www.lejsl.com/" target="_blank">Journal de Saône-et-Loire</a></div>
+    <div class="tile"><a href="https://www.lyonne.fr/" target="_blank">L'Yonne Républicaine</a></div>
+
+    <div class="separator"></div>
+
+    <!-- Chat -->
+    <div class="chat-container" id="chat">
+        <div class="chat-header" onclick="toggleChat()">Chat en ligne</div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Tapez un message...">
+            <button class="chat-send" onclick="sendMessage()">Envoyer</button>
+        </div>
     </div>
-    
-    <footer>© 2024 JHD</footer>
+
+    <!-- Bouton "Contactez-moi" -->
+    <a href="mailto:infos71@free.fr" class="contact-button">Contactez-moi</a>
+
+    <footer>© 2024 Hervé</footer>
+
+    <script>
+        // Changement de thème
+        function changeTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            body.setAttribute("data-theme", newTheme);
+        }
+
+        // Gestion du chat
+        function toggleChat() {
+            const chat = document.getElementById("chat");
+            chat.classList.toggle("open");
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById("chatInput");
+            const chatMessages = document.getElementById("chatMessages");
+            const message = chatInput.value.trim();
+            if (message) {
+                const messageElement = document.createElement("div");
+                messageElement.textContent = message;
+                messageElement.style.margin = "5px 0";
+                messageElement.style.color = "white";
+                chatMessages.appendChild(messageElement);
+                chatInput.value = "";
+            }
+        }
+    </script>
 </body>
 </html>
