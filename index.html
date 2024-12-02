@@ -77,8 +77,7 @@
         [data-theme="light"] .moon-icon {
             display: block;
         }
-
-        .card {
+		.card {
             background: var(--card-gradient-dark);
             padding: 15px;
             margin: 10px auto;
@@ -194,7 +193,7 @@
         .card.sliding .delete-indicator {
             right: 0;
         }
-		/* Styles pour le chat et les notifications */
+/* Styles pour le chat et les notifications */
         .chat-button {
             position: fixed;
             bottom: 20px;
@@ -212,23 +211,18 @@
 
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: -8px;
+            right: -8px;
             background: #ff4444;
             color: white;
             border-radius: 50%;
-            width: 20px;
+            min-width: 20px;
             height: 20px;
             font-size: 12px;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            display: none;
-        }
-
-        .notification-badge.show {
-            display: flex;
         }
 
         .chat-container {
@@ -293,10 +287,6 @@
             font-weight: bold;
             font-size: 0.9rem;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .chat-send:hover {
-            background: #3498db;
         }
 
         .message {
@@ -374,7 +364,7 @@
         <button onclick="addNewSite()">Ajouter</button>
     </div>
 
-    <!-- Chat avec badge de notification -->
+    <!-- Chat avec badge -->
     <button class="chat-button" onclick="toggleChat()">
         <span class="notification-badge" id="notificationBadge">0</span>
         💬 Chat
@@ -397,54 +387,119 @@
     <a href="mailto:infos71@free.fr" class="contact-button">Contactez moi</a>
 
     <footer>© 2024 JHD</footer>
-	<script>
+<script>
         // Audio pour les notifications
         const notificationSound = new Audio('data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVuiM+xAAAAAAD/+9DEAAAJdAF89AAAI0/ILn81wABEQhC6hCFVAgCAIA6D4Pg+D4IAgCAIf/xAEAQBAEP/8QBAEAQDgEHQfB8H3+D4Pg+CAIAgB/4gcAgc4Pg+D4Pg+DIIAAQQhDEIYxjGMY5jGMhDEIQjmMYxjGQhCEIAAD/w+D6wfZNGOiL3df//9vd13Re5COf//yEvf//5CGf///5jn////ao5/////9ZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/w+D4Pg+D4P/////////////+YPg+D4Pg+D/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+MYxjGMYxj/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////');
 
-        function changeTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-
-        // Restaurer le thème sauvegardé
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.body.setAttribute('data-theme', savedTheme);
-        }
-
-        // Demander la permission pour les notifications
-        let notificationsEnabled = false;
-        if ('Notification' in window) {
-            Notification.requestPermission().then(function(permission) {
-                notificationsEnabled = permission === 'granted';
-            });
-        }
-
+        // Initialisation des variables globales
+        let isChatOpen = false;
         let unreadMessages = 0;
+        let chatMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+        const chatContainer = document.querySelector('.chat-container');
         const badge = document.getElementById('notificationBadge');
 
-        function updateBadge() {
-            badge.textContent = unreadMessages;
-            badge.classList.toggle('show', unreadMessages > 0);
+        // Demander la permission pour les notifications
+        if ('Notification' in window) {
+            Notification.requestPermission();
         }
 
+        // Mettre à jour le badge
+        function updateBadge() {
+            badge.style.display = unreadMessages > 0 ? 'flex' : 'none';
+            badge.textContent = unreadMessages;
+        }
+
+        // Afficher une notification
         function showNotification(message) {
-            if (!document.hasFocus() && notificationsEnabled) {
-                new Notification('Nouveau message', {
-                    body: message,
-                    icon: 'icon-192x192.png'
-                });
-                notificationSound.play().catch(e => console.log('Erreur audio:', e));
-            }
             if (!isChatOpen) {
                 unreadMessages++;
                 updateBadge();
             }
+
+            notificationSound.play().catch(e => console.log('Erreur audio:', e));
+
+            if (Notification.permission === 'granted' && !document.hasFocus()) {
+                new Notification('Nouveau message dans le chat', {
+                    body: message,
+                    icon: 'https://jhd71.github.io/Actualites-Locales/icon-192x192.png'
+                });
+            }
         }
 
+        // Gérer l'ouverture/fermeture du chat
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            chatContainer.classList.toggle('open', isChatOpen);
+            
+            if (isChatOpen) {
+                unreadMessages = 0;
+                updateBadge();
+                document.getElementById('chatInput')?.focus();
+                scrollToBottom();
+            }
+        }
+
+        // Envoyer un message
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                const newMessage = {
+                    text: message,
+                    timestamp: new Date().toISOString(),
+                    sender: 'user'
+                };
+                
+                chatMessages.push(newMessage);
+                localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+                renderMessages();
+                showNotification(message);
+                input.value = '';
+                scrollToBottom();
+            }
+        }
+
+        // Afficher les messages
+        function renderMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            chatMessages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.sender === 'user' ? 'sent' : 'received'}`;
+                
+                const messageText = msg.text.replace(/(https?:\/\/[^\s]+)/g, 
+                    '<a href="$1" target="_blank" style="color: #00aaff;">$1</a>');
+                
+                messageDiv.innerHTML = messageText;
+                messagesContainer.appendChild(messageDiv);
+            });
+        }
+
+        // Défiler jusqu'en bas
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Gérer la visibilité de la page
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && isChatOpen) {
+                unreadMessages = 0;
+                updateBadge();
+            }
+        });
+
+        // Fonction pour le thème
+        function changeTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Sites personnalisés
         let userSites = JSON.parse(localStorage.getItem('userSites')) || [];
         const userSitesContainer = document.getElementById('user-sites');
 
@@ -532,73 +587,8 @@
             });
         }
 
+        // Initialiser les sites utilisateur
         renderUserSites();
-
-        // Gestion du chat
-        let isChatOpen = false;
-        let chatMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
-        const chatContainer = document.querySelector('.chat-container');
-
-        function toggleChat() {
-            isChatOpen = !isChatOpen;
-            chatContainer.classList.toggle('open', isChatOpen);
-            if (isChatOpen) {
-                unreadMessages = 0;
-                updateBadge();
-                document.getElementById('chatInput')?.focus();
-                scrollToBottom();
-            }
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (message) {
-                const newMessage = {
-                    text: message,
-                    timestamp: new Date().toISOString(),
-                    sender: 'user'
-                };
-                
-                chatMessages.push(newMessage);
-                localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
-                renderMessages();
-                showNotification(message);
-                input.value = '';
-                scrollToBottom();
-            }
-        }
-
-        function renderMessages() {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.innerHTML = '';
-            
-            chatMessages.forEach(msg => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${msg.sender === 'user' ? 'sent' : 'received'}`;
-                
-                // Vérifier si le message contient un lien
-                const messageText = msg.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #00aaff;">$1</a>');
-                
-                messageDiv.innerHTML = messageText;
-                messagesContainer.appendChild(messageDiv);
-            });
-        }
-
-        function scrollToBottom() {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // Charger les messages au démarrage
-        renderMessages();
-
-        // Nettoyer les vieux messages (garder seulement les 50 derniers)
-        if (chatMessages.length > 50) {
-            chatMessages = chatMessages.slice(-50);
-            localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
-        }
 
         // Service Worker pour PWA
         if ('serviceWorker' in navigator) {
