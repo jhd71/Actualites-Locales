@@ -22,6 +22,7 @@
             --text-light: #333;
             --tile-bg-dark: linear-gradient(135deg, #3949ab, #1a237e);
             --tile-bg-light: linear-gradient(135deg, #64b5f6, #1e88e5);
+            --separator-color: rgba(255, 255, 255, 0.3);
         }
 
         body {
@@ -87,11 +88,19 @@
             transform: translateY(-3px);
         }
 
+        .separator {
+            width: 80%;
+            margin: 15px auto;
+            height: 2px;
+            background: var(--separator-color);
+            border-radius: 1px;
+        }
+
         .add-site-form {
             margin: 20px auto;
-            max-width: 280px;
+            max-width: 250px;
             background: var(--tile-bg-dark);
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
@@ -102,11 +111,12 @@
 
         .add-site-form input {
             width: calc(100% - 20px);
-            padding: 10px;
+            padding: 8px;
             margin: 10px 0;
             border: none;
             border-radius: 5px;
             outline: none;
+            font-size: 0.9em;
         }
 
         .add-site-form button {
@@ -148,7 +158,16 @@
         <a class="tile" href="https://linformateurdebourgogne.com/" target="_blank">L'Informateur de Bourgogne</a>
         <a class="tile" href="https://www.lejsl.com/edition-montceau-les-mines" target="_blank">Le JSL</a>
         <a class="tile" href="https://www.creusot-infos.com/" target="_blank">Creusot Infos</a>
+
+        <!-- Séparation -->
+        <div class="separator"></div>
+
+        <a class="tile" href="https://www.radio-en-ligne.fr/radio-sans-pub" target="_blank">Radio Sans Pub</a>
+        <a class="tile" href="https://youtube.com" target="_blank">YouTube</a>
     </div>
+
+    <!-- Séparation -->
+    <div class="separator"></div>
 
     <!-- Formulaire ajout site -->
     <div class="add-site-form">
@@ -156,9 +175,6 @@
         <input type="url" id="site-url" placeholder="URL du site (https://...)" />
         <button onclick="addSite()">Ajouter un site</button>
     </div>
-
-    <!-- Bouton Contact -->
-    <a class="tile" href="mailto:infos@jhd71.fr">Contactez-moi</a>
 
     <!-- Footer -->
     <footer>© 2024 JHD</footer>
@@ -189,9 +205,11 @@
             newTile.href = url;
             newTile.target = "_blank";
             newTile.textContent = name;
-            tileContainer.appendChild(newTile);
 
-            // Reset form
+            // Ajouter au-dessus de la section d'ajout
+            tileContainer.insertBefore(newTile, document.querySelector('.separator:last-of-type'));
+
+            // Réinitialiser le formulaire
             document.getElementById("site-name").value = "";
             document.getElementById("site-url").value = "";
         }
