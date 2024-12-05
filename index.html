@@ -1,43 +1,37 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actualités</title>
-
-    <!-- Meta Tags pour PWA -->
-    <link rel="manifest" href="/manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#1a1a1a">
-    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Actualités">
-    <meta name="description" content="Consultez vos actualités et personnalisez votre expérience.">
+    <meta name="description" content="Actualités locales personnalisées">
+    <title>Actualités Locales</title>
 
+    <!-- Manifest -->
+    <link rel="manifest" href="/Actualites-Locales/manifest.json">
+
+    <!-- Styles -->
     <style>
-        /* Variables CSS */
         :root {
             --bg-dark: #1a1a1a;
             --bg-light: #f5f5f5;
             --text-dark: white;
             --text-light: #333;
-            --card-bg: linear-gradient(135deg, #3949ab, #2196f3);
-            --button-bg: #3949ab;
-            --button-hover: #2c387e;
+            --tile-bg-dark: linear-gradient(135deg, #3949ab, #1a237e);
+            --tile-bg-light: linear-gradient(135deg, #64b5f6, #1e88e5);
         }
 
-        /* Corps de la page */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-dark);
             transition: background-color 0.3s, color 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-bottom: 100px;
+            text-align: center;
+            padding: 10px;
         }
 
         body[data-theme="light"] {
@@ -45,100 +39,94 @@
             color: var(--text-light);
         }
 
-        /* Bouton Thème */
+        h1 {
+            margin-top: 20px;
+            font-size: 1.8em;
+        }
+
         .theme-toggle {
             position: fixed;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
+            top: 10px;
+            right: 10px;
+            background: var(--tile-bg-dark);
+            color: white;
             border: none;
             border-radius: 50%;
-            background: var(--button-bg);
-            color: white;
-            cursor: pointer;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .theme-toggle:hover {
-            background: var(--button-hover);
-        }
-
-        /* Tuiles */
-        .card {
-            background: var(--card-bg);
-            color: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 300px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
-        .card a {
+        body[data-theme="light"] .theme-toggle {
+            background: var(--tile-bg-light);
+        }
+
+        .tile {
+            background: var(--tile-bg-dark);
             color: white;
-            text-decoration: none;
-        }
-
-        /* Section Ajout de site */
-        .add-site-container {
-            background: var(--card-bg);
             padding: 15px;
-            border-radius: 10px;
+            margin: 10px auto;
+            border-radius: 8px;
+            max-width: 280px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            margin: 20px 0;
-            width: 90%;
-            max-width: 320px;
+            font-size: 1em;
+            text-decoration: none;
+            display: block;
+            transition: transform 0.2s;
         }
 
-        .add-site-container input {
+        body[data-theme="light"] .tile {
+            background: var(--tile-bg-light);
+        }
+
+        .tile:hover {
+            transform: translateY(-3px);
+        }
+
+        .add-site-form {
+            margin: 20px auto;
+            max-width: 280px;
+            background: var(--tile-bg-dark);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        body[data-theme="light"] .add-site-form {
+            background: var(--tile-bg-light);
+        }
+
+        .add-site-form input {
             width: calc(100% - 20px);
-            margin: 5px 0;
             padding: 10px;
-            border-radius: 5px;
+            margin: 10px 0;
             border: none;
+            border-radius: 5px;
             outline: none;
         }
 
-        .add-site-container button {
+        .add-site-form button {
             width: 100%;
             padding: 10px;
-            background: var(--button-bg);
-            color: white;
             border: none;
             border-radius: 5px;
+            background: var(--tile-bg-dark);
+            color: white;
+            font-weight: bold;
             cursor: pointer;
         }
 
-        .add-site-container button:hover {
-            background: var(--button-hover);
+        body[data-theme="light"] .add-site-form button {
+            background: var(--tile-bg-light);
         }
 
-        /* Bouton Contact */
-        .contact-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--button-bg);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            text-decoration: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .contact-button:hover {
-            background: var(--button-hover);
-        }
-
-        /* Footer */
         footer {
             margin-top: 20px;
-            font-size: 0.9em;
+            text-align: center;
             color: rgba(255, 255, 255, 0.6);
         }
 
@@ -147,69 +135,72 @@
         }
     </style>
 </head>
-
 <body data-theme="dark">
-
-    <!-- Bouton Thème -->
+    <!-- Mode clair/sombre -->
     <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 
     <!-- Titre -->
     <h1>Actualités</h1>
 
     <!-- Tuiles des sites -->
-    <div class="card"><a href="https://www.montceau-news.com/" target="_blank">Montceau News</a></div>
-    <div class="card"><a href="https://linformateurdebourgogne.com/" target="_blank">L'Informateur de Bourgogne</a></div>
-    <div class="card"><a href="https://www.lejsl.com/edition-montceau-les-mines" target="_blank">Journal de Saône-et-Loire</a></div>
-    <div class="card"><a href="https://www.creusot-infos.com/" target="_blank">Creusot Infos</a></div>
+    <div id="site-tiles">
+        <a class="tile" href="https://www.montceau-news.com/" target="_blank">Montceau News</a>
+        <a class="tile" href="https://linformateurdebourgogne.com/" target="_blank">L'Informateur de Bourgogne</a>
+        <a class="tile" href="https://www.lejsl.com/edition-montceau-les-mines" target="_blank">Le JSL</a>
+        <a class="tile" href="https://www.creusot-infos.com/" target="_blank">Creusot Infos</a>
+    </div>
 
-    <!-- Ajout de site personnalisé -->
-    <div id="user-sites"></div>
-    <div class="add-site-container">
-        <input type="text" id="site-name" placeholder="Nom du site">
-        <input type="url" id="site-url" placeholder="URL du site (https://...)">
+    <!-- Formulaire ajout site -->
+    <div class="add-site-form">
+        <input type="text" id="site-name" placeholder="Nom du site" />
+        <input type="url" id="site-url" placeholder="URL du site (https://...)" />
         <button onclick="addSite()">Ajouter un site</button>
     </div>
 
     <!-- Bouton Contact -->
-    <a href="mailto:infos@jhd71.fr" class="contact-button">Contactez-moi</a>
+    <a class="tile" href="mailto:infos@jhd71.fr">Contactez-moi</a>
 
     <!-- Footer -->
-    <footer>©2024 JHD</footer>
+    <footer>© 2024 JHD</footer>
 
+    <!-- Script -->
     <script>
-        // Gestion du Thème
         function toggleTheme() {
-            const currentTheme = document.body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.body.setAttribute('data-theme', savedTheme);
-        });
-
-        // Gestion des sites personnalisés
         function addSite() {
-            const name = document.getElementById('site-name').value.trim();
-            const url = document.getElementById('site-url').value.trim();
+            const name = document.getElementById("site-name").value.trim();
+            const url = document.getElementById("site-url").value.trim();
             if (!name || !url) {
-                alert('Veuillez remplir les deux champs');
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                alert("URL invalide. Elle doit commencer par http:// ou https://");
                 return;
             }
 
-            const container = document.getElementById('user-sites');
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `<a href="${url}" target="_blank">${name}</a>`;
-            container.prepend(card);
+            const tileContainer = document.getElementById("site-tiles");
+            const newTile = document.createElement("a");
+            newTile.className = "tile";
+            newTile.href = url;
+            newTile.target = "_blank";
+            newTile.textContent = name;
+            tileContainer.appendChild(newTile);
 
-            // Reset des champs
-            document.getElementById('site-name').value = '';
-            document.getElementById('site-url').value = '';
+            // Reset form
+            document.getElementById("site-name").value = "";
+            document.getElementById("site-url").value = "";
         }
+
+        // Récupération du thème sauvegardé
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme") || "dark";
+            document.body.setAttribute("data-theme", savedTheme);
+        });
     </script>
 </body>
-
 </html>
