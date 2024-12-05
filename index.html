@@ -1,1 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualités</title>
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-light: #f5f5f5;
+            --text-dark: white;
+            --text-light: #333;
+            --card-bg: linear-gradient(135deg, #3949ab, #2196f3);
+            --button-bg: #3949ab;
+        }
 
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body[data-theme="light"] {
+            background: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        h1 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 15px;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            max-width: 280px;
+            word-wrap: break-word;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .card a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .add-site-container {
+            margin-top: 30px;
+            max-width: 280px;
+            text-align: center;
+        }
+
+        .add-site-container input {
+            width: calc(100% - 20px);
+            margin-bottom: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .add-site-container button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: var(--button-bg);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .footer {
+            margin-top: auto;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+            text-align: left;
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+        }
+
+        .contact-button {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: var(--button-bg);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-button:hover {
+            background: rgba(57, 73, 171, 0.8);
+        }
+
+        /* Animation de suppression */
+        .card.deleting {
+            transition: transform 0.3s, opacity 0.3s;
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Bouton Thème -->
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 4a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1zm0 12a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zM4 12a1 1 0 0 1 1 1H5a1 1 0 1 1 0-2H4a1 1 0 0 1-1 1zm14 0a1 1 0 0 1 1 1h2a1 1 0 1 1 0-2h-2a1 1 0 0 1-1 1z"/>
+        </svg>
+    </button>
+
+    <h1>Actualités</h1>
+
+    <!-- Tuiles prédéfinies -->
+    <div class="card">
+        <a href="https://www.montceau-news.com/" target="_blank">Montceau News</a>
+    </div>
+    <div class="card">
+        <a href="https://linformateurdebourgogne.com/" target="_blank">L'Informateur de Bourgogne</a>
+    </div>
+    <div class="card">
+        <a href="https://www.lejsl.com/edition-montceau-les-mines" target="_blank">Journal de Saône-et-Loire</a>
+    </div>
+    <div class="card">
+        <a href="https://www.creusot-infos.com/" target="_blank">Creusot Infos</a>
+    </div>
+
+    <!-- Sites déjà ajoutés -->
+    <div id="user-sites"></div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="add-site-container">
+        <input type="text" id="site-name" placeholder="Nom du site">
+        <input type="url" id="site-url" placeholder="URL du site (https://...)">
+        <button onclick="addSite()">Ajouter un site</button>
+    </div>
+
+    <!-- Footer et Contact -->
+    <div class="footer">©2024 JHD</div>
+    <a href="mailto:infos@jhd71.fr" class="contact-button">Contactez-moi</a>
+
+    <script>
+        const userSitesContainer = document.getElementById('user-sites');
+
+        function addSite() {
+            const siteName = document.getElementById('site-name').value.trim();
+            const siteUrl = document.getElementById('site-url').value.trim();
+
+            if (!siteName || !siteUrl) {
+                alert('Veuillez entrer un nom et une URL.');
+                return;
+            }
+
+            if (!siteUrl.startsWith('http://') && !siteUrl.startsWith('https://')) {
+                alert('URL invalide. Elle doit commencer par http:// ou https://.');
+                return;
+            }
+
+            const newSite = { name: siteName, url: siteUrl };
+            const userSites = JSON.parse(localStorage.getItem('userSites') || '[]');
+            userSites.unshift(newSite); // Ajouter au début
+            localStorage.setItem('userSites', JSON.stringify(userSites));
+
+            renderUserSites();
+            document.getElementById('site-name').value = '';
+            document.getElementById('site-url').value = '';
+        }
+
+        function renderUserSites() {
+            const userSites = JSON.parse(localStorage.getItem('userSites') || '[]');
+            userSitesContainer.innerHTML = '';
+
+            userSites.forEach((site, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<a href="${site.url}" target="_blank">${site.name}</a>`;
+                userSitesContainer.insertBefore(card, userSitesContainer.firstChild);
+
+                // Gestion du swipe pour suppression
+                addSwipeToDelete(card, index);
+            });
+        }
+
+        function addSwipeToDelete(card, index) {
+            let startX, isDragging = false;
+
+            card.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            });
+
+            card.addEventListener('touchmove', e => {
+                if (!isDragging) return;
+                const diff = e.touches[0].clientX - startX;
+                card.style.transform = `translateX(${diff}px)`;
+            });
+
+            card.addEventListener('touchend', () => {
+                const diff = parseInt(card.style.transform.replace('translateX(', '') || '0');
+                if (diff < -50) {
+                    if (confirm('Voulez-vous supprimer ce site ?')) {
+                        const userSites = JSON.parse(localStorage.getItem('userSites') || '[]');
+                        userSites.splice(index, 1); // Supprimer l'élément
+                        localStorage.setItem('userSites', JSON.stringify(userSites));
+                        renderUserSites();
+                    } else {
+                        card.style.transform = 'translateX(0)';
+                    }
+                } else {
+                    card.style.transform = 'translateX(0)';
+                }
+                isDragging = false;
+            });
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            renderUserSites();
+        });
+    </script>
+</body>
+</html>
