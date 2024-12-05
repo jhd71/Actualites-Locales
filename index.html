@@ -78,6 +78,7 @@
             text-decoration: none;
             display: block;
             transition: transform 0.2s;
+            position: relative;
         }
 
         body[data-theme="light"] .tile {
@@ -164,10 +165,13 @@
 
         <a class="tile" href="https://www.radio-en-ligne.fr/radio-sans-pub" target="_blank">Radio Sans Pub</a>
         <a class="tile" href="https://youtube.com" target="_blank">YouTube</a>
+
+        <!-- Séparation -->
+        <div class="separator"></div>
     </div>
 
-    <!-- Séparation -->
-    <div class="separator"></div>
+    <!-- Sites personnalisés -->
+    <div id="user-sites"></div>
 
     <!-- Formulaire ajout site -->
     <div class="add-site-form">
@@ -199,25 +203,47 @@
                 return;
             }
 
-            const tileContainer = document.getElementById("site-tiles");
-            const newTile = document.createElement("a");
-            newTile.className = "tile";
-            newTile.href = url;
-            newTile.target = "_blank";
-            newTile.textContent = name;
+            const userSites = JSON.parse(localStorage.getItem("userSites") || "[]");
+            userSites.push({ name, url });
+            localStorage.setItem("userSites", JSON.stringify(userSites));
 
-            // Ajouter au-dessus de la section d'ajout
-            tileContainer.insertBefore(newTile, document.querySelector('.separator:last-of-type'));
-
-            // Réinitialiser le formulaire
+            renderUserSites();
             document.getElementById("site-name").value = "";
             document.getElementById("site-url").value = "";
         }
 
-        // Récupération du thème sauvegardé
+        function renderUserSites() {
+            const userSites = JSON.parse(localStorage.getItem("userSites") || "[]");
+            const container = document.getElementById("user-sites");
+            container.innerHTML = "";
+
+            userSites.forEach((site, index) => {
+                const tile = document.createElement("div");
+                tile.className = "tile";
+                tile.textContent = site.name;
+                tile.style.position = "relative";
+                tile.href = site.url;
+
+                // Swipe to delete
+                let startX;
+                tile.addEventListener("touchstart", (e) => (startX = e.touches[0].clientX));
+                tile.addEventListener("touchend", (e) => {
+                    const endX = e.changedTouches[0].clientX;
+                    if (startX - endX > 50 && confirm("Supprimer ce site ?")) {
+                        userSites.splice(index, 1);
+                        localStorage.setItem("userSites", JSON.stringify(userSites));
+                        renderUserSites();
+                    }
+                });
+
+                container.appendChild(tile);
+            });
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             const savedTheme = localStorage.getItem("theme") || "dark";
             document.body.setAttribute("data-theme", savedTheme);
+            renderUserSites();
         });
     </script>
 </body>
