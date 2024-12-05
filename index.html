@@ -1,1 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualités</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+    <meta name="description" content="Ajoutez vos sites préférés">
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-light: #f5f5f5;
+            --text-dark: white;
+            --text-light: #333;
+            --button-bg: #3949ab;
+            --button-hover: #5c6bc0;
+        }
 
+        /* Styles de base */
+        body {
+            margin: 0;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body[data-theme="light"] {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        /* Bouton Thème */
+        .theme-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tuiles */
+        .card {
+            background: var(--button-bg);
+            padding: 15px 20px;
+            margin: 10px auto;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            max-width: 280px;
+            transition: background-color 0.3s;
+        }
+
+        .card:hover {
+            background-color: var(--button-hover);
+        }
+
+        /* Formulaire d'ajout de site */
+        .sites-form-container {
+            background: var(--button-bg);
+            max-width: 280px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .add-site-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .add-site-form input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .add-site-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .add-site-form button {
+            padding: 10px;
+            background: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .add-site-form button:hover {
+            background-color: var(--button-hover);
+        }
+
+        /* Bouton contact */
+        .contact-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--button-bg);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-button:hover {
+            background-color: var(--button-hover);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding: 10px 0;
+            font-size: 0.9em;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Bouton Thème -->
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+
+    <h1>Actualités</h1>
+
+    <!-- Tuiles -->
+    <div id="user-sites">
+        <div class="card">
+            <a href="https://www.montceau-news.com/" target="_blank" style="color: white; text-decoration: none;">Montceau News</a>
+        </div>
+        <div class="card">
+            <a href="https://linformateurdebourgogne.com/" target="_blank" style="color: white; text-decoration: none;">L'Informateur de Bourgogne</a>
+        </div>
+        <div class="card">
+            <a href="https://www.lejsl.com/edition-montceau-les-mines" target="_blank" style="color: white; text-decoration: none;">Journal de Saône-et-Loire</a>
+        </div>
+        <div class="card">
+            <a href="https://www.creusot-infos.com/" target="_blank" style="color: white; text-decoration: none;">Creusot Infos</a>
+        </div>
+    </div>
+
+    <!-- Formulaire d'ajout de site -->
+    <div class="sites-form-container">
+        <div class="add-site-form">
+            <input type="text" id="site-name" placeholder="Nom du site">
+            <input type="url" id="site-url" placeholder="URL du site">
+            <button onclick="addSite()">Ajouter un site</button>
+        </div>
+    </div>
+
+    <!-- Bouton contact -->
+    <a href="mailto:infos@jhd71.fr" class="contact-button">Contactez-moi</a>
+
+    <footer>©2024 JHD</footer>
+
+    <script>
+        // Mode clair/sombre
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+        }
+
+        // Ajouter un site
+        function addSite() {
+            const nameInput = document.getElementById('site-name');
+            const urlInput = document.getElementById('site-url');
+            const name = nameInput.value.trim();
+            const url = urlInput.value.trim();
+
+            if (!name || !url) {
+                alert("Veuillez remplir tous les champs !");
+                return;
+            }
+
+            const userSites = document.getElementById('user-sites');
+            const newCard = document.createElement('div');
+            newCard.className = 'card';
+            newCard.innerHTML = `<a href="${url}" target="_blank" style="color: white; text-decoration: none;">${name}</a>`;
+            userSites.insertBefore(newCard, userSites.firstChild);
+
+            nameInput.value = '';
+            urlInput.value = '';
+        }
+    </script>
+</body>
+</html>
