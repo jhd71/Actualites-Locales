@@ -218,16 +218,15 @@
             container.innerHTML = "";
 
             userSites.forEach((site, index) => {
-                const tile = document.createElement("div");
-                tile.className = "tile";
-                tile.textContent = site.name;
-                tile.style.position = "relative";
-                tile.href = site.url;
+                const link = document.createElement("a");
+                link.className = "tile";
+                link.href = site.url;
+                link.target = "_blank";
+                link.textContent = site.name;
 
                 // Swipe to delete
-                let startX;
-                tile.addEventListener("touchstart", (e) => (startX = e.touches[0].clientX));
-                tile.addEventListener("touchend", (e) => {
+                link.addEventListener("touchstart", (e) => (startX = e.touches[0].clientX));
+                link.addEventListener("touchend", (e) => {
                     const endX = e.changedTouches[0].clientX;
                     if (startX - endX > 50 && confirm("Supprimer ce site ?")) {
                         userSites.splice(index, 1);
@@ -236,7 +235,7 @@
                     }
                 });
 
-                container.appendChild(tile);
+                container.appendChild(link);
             });
         }
 
