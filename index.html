@@ -1,1 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Actualités">
+    <meta name="description" content="Actualités locales personnalisées">
+    <title>Actualités Locales</title>
 
+    <link rel="manifest" href="/Actualites-Locales/manifest.json">
+
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-light: #f5f5f5;
+            --text-dark: white;
+            --text-light: #333;
+            --tile-bg-dark: linear-gradient(135deg, #3949ab, #1a237e);
+            --tile-bg-light: linear-gradient(135deg, #64b5f6, #1e88e5);
+            --separator-color: rgba(255, 255, 255, 0.3);
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            transition: background-color 0.3s, color 0.3s;
+            text-align: center;
+            padding: 10px;
+        }
+
+        body[data-theme="light"] {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: 1.8em;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: var(--tile-bg-dark);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body[data-theme="light"] .theme-toggle {
+            background: var(--tile-bg-light);
+        }
+
+        .tile {
+            background: var(--tile-bg-dark);
+            color: white;
+            padding: 15px;
+            margin: 10px auto;
+            border-radius: 8px;
+            max-width: 280px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 1em;
+            text-decoration: none;
+            display: block;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        body[data-theme="light"] .tile {
+            background: var(--tile-bg-light);
+        }
+
+        .tile:hover {
+            transform: translateY(-3px);
+        }
+
+        .separator {
+            width: 80%;
+            margin: 15px auto;
+            height: 2px;
+            background: var(--separator-color);
+            border-radius: 1px;
+        }
+
+        .add-site-form {
+            margin: 20px auto;
+            max-width: 250px;
+            background: var(--tile-bg-dark);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        body[data-theme="light"] .add-site-form {
+            background: var(--tile-bg-light);
+        }
+
+        .add-site-form input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            font-size: 0.9em;
+        }
+
+        .add-site-form button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: var(--tile-bg-dark);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        body[data-theme="light"] .add-site-form button {
+            background: var(--tile-bg-light);
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        body[data-theme="light"] footer {
+            color: rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+    <h1>Actualités</h1>
+
+    <div id="site-tiles">
+        <a class="tile" href="https://www.montceau-news.com/" target="_blank">Montceau News</a>
+        <a class="tile" href="https://linformateurdebourgogne.com/" target="_blank">L'Informateur de Bourgogne</a>
+        <a class="tile" href="https://www.lejsl.com/edition-montceau-les-mines" target="_blank">Le JSL</a>
+        <a class="tile" href="https://www.creusot-infos.com/" target="_blank">Creusot Infos</a>
+
+        <div class="separator"></div>
+
+        <a class="tile" href="https://www.radio-en-ligne.fr/radio-sans-pub" target="_blank">Radio Sans Pub</a>
+        <a class="tile" href="https://www.youtube.com/" target="_blank">YouTube</a>
+
+        <div class="separator"></div>
+    </div>
+
+    <div id="user-sites"></div>
+
+    <div class="add-site-form">
+        <input type="text" id="site-name" placeholder="Nom du site" />
+        <input type="url" id="site-url" placeholder="URL du site (https://...)" />
+        <button onclick="addSite()">Ajouter un site</button>
+    </div>
+
+    <footer>© 2024 JHD</footer>
+
+    <script>
+        function toggleTheme() {
+            const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        function addSite() {
+            const name = document.getElementById("site-name").value.trim();
+            const url = document.getElementById("site-url").value.trim();
+            if (!name || !url) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                alert("URL invalide. Elle doit commencer par http:// ou https://");
+                return;
+            }
+
+            const userSites = JSON.parse(localStorage.getItem("userSites") || "[]");
+            userSites.push({ name, url });
+            localStorage.setItem("userSites", JSON.stringify(userSites));
+
+            renderUserSites();
+            document.getElementById("site-name").value = "";
+            document.getElementById("site-url").value = "";
+        }
+
+        function renderUserSites() {
+            const userSites = JSON.parse(localStorage.getItem("userSites") || "[]");
+            const container = document.getElementById("user-sites");
+            container.innerHTML = "";
+
+            userSites.forEach((site, index) => {
+                const link = document.createElement("a");
+                link.className = "tile";
+                link.href = site.url;
+                link.target = "_blank";
+                link.textContent = site.name;
+
+                // Swipe to delete
+                link.addEventListener("touchstart", (e) => (startX = e.touches[0].clientX));
+                link.addEventListener("touchend", (e) => {
+                    const endX = e.changedTouches[0].clientX;
+                    if (startX - endX > 50 && confirm("Supprimer ce site ?")) {
+                        userSites.splice(index, 1);
+                        localStorage.setItem("userSites", JSON.stringify(userSites));
+                        renderUserSites();
+                    }
+                });
+
+                container.appendChild(link);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme") || "dark";
+            document.body.setAttribute("data-theme", savedTheme);
+            renderUserSites();
+        });
+
+        // Enregistrement du Service Worker (inline)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:application/javascript;base64,YW5kIHRoZW4oKSB7CiAgICAgICAgcmV0dXJuIGNhY2hlLnB1dCgocmVxdWVzdCkgPT4gewogICAgICAgICAgICBjb25zdCBmZXRjaFJlc3BvbnNlID0gY2FjaGUubWF0Y2gocmVxdWVzdCk7CiAgICAgICAgICAgIGlmIChmZXRjaFJlc3BvbnNlKSB7CiAgICAgICAgICAgICAgICByZXR1cm4gZmV0Y2hSZXNwb25zZTsKICAgICAgICAgICAgfQogICAgICAgICAgICBjb25zdCByZXNwb25zZSA9IGF3YWl0IGZldGNoKHJlcXVlc3QpOwogICAgICAgICAgICBjYWNoZS5wdXQocmVxdWVzdC5jbG9uZSgpLCByZXNwb25zZS5jbG9uZSgpKTsKICAgICAgICAgICAgcmV0dXJuIHJlc3BvbnNlOwogICAgICAgIH0pOwogICAgfSk7Cn0pOwo=')
+                    .then(registration => {
+                        console.log('Service Worker enregistré avec succès :', registration);
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de l\'enregistrement du Service Worker :', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
