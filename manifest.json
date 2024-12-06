@@ -1,24 +1,21 @@
 {
-    "name": "Actualités locales",
-    "short_name": "Actualités",
-    "description": "Accès rapide aux actualités locales et personnalisées",
-    "start_url": "https://jhd71.github.io/Actualites-Locales/",
-    "display": "standalone",
-    "background_color": "#1a1a1a",
-    "theme_color": "#1a1a1a",
-    "orientation": "portrait",
-    "icons": [
-        {
-            "src": "icon-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "icon-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        }
-    ]
+  "short_name": "Actualités",
+  "name": "Actualités Locales",
+  "icons": [
+    {
+      "src": "/Actualites-Locales/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/Actualites-Locales/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/Actualites-Locales/index.html",
+  "background_color": "#1a1a1a",
+  "display": "standalone",
+  "scope": "/Actualites-Locales/",
+  "theme_color": "#1a1a1a" 
 }
